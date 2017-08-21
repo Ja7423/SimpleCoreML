@@ -20,6 +20,14 @@ class CameraViewController: UIViewController, CameraModelDelegate {
                 willSet {
                         updateRequests(newValue)
                 }
+                didSet {
+                        if openVision {
+                                visibleButton?.setImage(UIImage(named: "visible-open.png"), for: .normal)
+                        } else {
+                                visibleButton?.setImage(UIImage(named: "visible-close.png"), for: .normal)
+                                identifyResult = ""
+                        }
+                }
         }
         
         var previewView = UIView()
@@ -97,7 +105,7 @@ class CameraViewController: UIViewController, CameraModelDelegate {
         
         private func configureVisibleButton() -> UIButton {
                 let button = UIButton(frame: CGRect(x: self.view.frame.size.width - 60, y: 10, width: 50, height: 50))
-                button.setImage(UIImage(named: "visible.png"), for: .normal)
+                button.setImage(UIImage(named: "visible-close.png"), for: .normal)
                 button.backgroundColor = .clear
                 button.addTarget(self, action: #selector(clickVisibleButton(_:)), for: .touchUpInside)
                 return button
@@ -140,7 +148,9 @@ class CameraViewController: UIViewController, CameraModelDelegate {
         
         func processMLRequest(result : VNClassificationObservation) {
                 DispatchQueue.main.async {
-                        self.identifyResult = "\(result.identifier) : \(Int(result.confidence * 100))%"
+                        if self.openVision {
+                                self.identifyResult = "\(result.identifier) : \(Int(result.confidence * 100))%"
+                        }
                 }
         }
         
